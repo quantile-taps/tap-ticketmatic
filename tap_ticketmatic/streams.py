@@ -473,3 +473,43 @@ class SeatRanks(TicketmaticStream):
         }
 
         return params
+
+class EventLocations(TicketmaticStream):
+    """
+    The event locations.
+    """
+    name = "event_locations"
+    path = "/settings/events/eventlocations"
+    primary_keys = ["id"]
+
+    schema = th.PropertiesList(
+        th.Property("id", th.IntegerType),
+        th.Property("name", th.StringType),
+        th.Property("street1", th.StringType),
+        th.Property("street2", th.StringType),
+        th.Property("street3", th.StringType),
+        th.Property("street4", th.StringType),
+        th.Property("zip", th.BooleanType),
+        th.Property("city", th.StringType),
+        th.Property("state", th.StringType),
+        th.Property("countrycode", th.StringType),
+        th.Property("info", th.StringType),
+        th.Property("createdts", th.DateTimeType),
+        th.Property("lastupdatets", th.DateTimeType),
+        th.Property("isarchived", th.BooleanType),
+
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: Optional[dict],
+        next_page_token: Optional[Any],
+    ) -> Dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization."""
+        params = {
+            "limit": self.limit_per_request,
+            "output": "withlookup",
+            "includearchived": "true",
+        }
+
+        return params

@@ -4,13 +4,14 @@ from typing import List
 
 from singer_sdk import Stream, Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
-from tap_ticketmatic.streams import Orders, Events, PriceTypes, SeatRanks
+from tap_ticketmatic.streams import Orders, Events, PriceTypes, SeatRanks, EventLocations
 
 STREAM_TYPES = [
-    Orders,
-    Events,
-    PriceTypes,
-    SeatRanks,
+    # Orders,
+    # Events,
+    # PriceTypes,
+    # SeatRanks,
+    EventLocations,
 ]
 
 
