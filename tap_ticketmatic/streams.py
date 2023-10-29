@@ -125,6 +125,9 @@ class Orders(TicketmaticStream):
         th.Property("webskinid", th.IntegerType),
         th.Property("createdts", th.DateTimeType),
         th.Property("lastupdatets", th.DateTimeType),
+        th.Property("c_remark", th.StringType),
+        th.Property("c_podiumpascode", th.StringType),
+        th.Property("c_donatie", th.StringType),
     ).to_dict()
 
 
@@ -136,37 +139,35 @@ class Events(TicketmaticStream):
     replication_key = "lastupdatets"
 
     schema = th.PropertiesList(
-        # Yesplan information that was added by Schouwburg Haarlem
-        th.Property("c_ypid", th.StringType),  # Yesplan ID
-        th.Property("c_genre", th.ArrayType(th.IntegerType)),
-        th.Property("c_oldid", th.StringType),
-        th.Property("c_ypname", th.StringType),
-        th.Property("c_ypstartts", th.DateTimeType),
-        th.Property("c_ypendts", th.DateTimeType),
-        th.Property("c_yplocationid", th.IntegerType),
-        th.Property("c_yplocationname", th.StringType),
 
-        th.Property("c_ypupdatets", th.DateTimeType),
-        th.Property("c_pkiid", th.StringType),
-        th.Property("c_bkhcode", th.StringType),
-        th.Property("c_production", th.IntegerType),
-        th.Property("c_organiser", th.IntegerType),
-        th.Property("c_extrainfo", th.StringType),
         th.Property("c_ticketlayoutvariant", th.StringType),
-        th.Property("c_facility", th.IntegerType),
-
-        th.Property("c_consumpties", th.NumberType),
-        th.Property("c_garderobe", th.NumberType),
-        th.Property("c_apponly", th.BooleanType),
+        th.Property("c_genre", th.StringType),
+        th.Property("c_season", th.StringType),
+        th.Property("c_hasupsells", th.StringType),
+        th.Property("c_isupsellfor", th.StringType),
+        th.Property("c_ypname", th.StringType),
+        th.Property("c_ypid", th.StringType),
+        th.Property("c_ypstartts", th.StringType),
+        th.Property("c_ypendts", th.StringType),
+        th.Property("c_yplocationid", th.StringType),
+        th.Property("c_yplocationname", th.StringType),
+        th.Property("c_ypupdatets", th.StringType),
+        th.Property("c_ticketfee", th.StringType),
+        th.Property("c_oldid", th.StringType),
+        th.Property("c_ypaltid", th.StringType),
+        th.Property("c_extratickettext", th.StringType),
+        th.Property("c_noordercosts", th.StringType),
+        th.Property("c_pkiid", th.StringType),
+        th.Property("c_grootboekrekening", th.StringType),
+        th.Property("c_vismanetcode", th.StringType),
+        th.Property("c_apponly", th.StringType),
         th.Property("c_sendtofriend", th.StringType),
-        th.Property("c_financieleafspraak", th.IntegerType),
-        th.Property("c_placering", th.IntegerType),
-        th.Property("c_orkestbak", th.StringType),
-        th.Property("c_schoneborderel", th.IntegerType),
+        th.Property("c_codedisplaybeforestart", th.StringType),
+        th.Property("c_btwcode", th.StringType),
+        th.Property("c_status", th.StringType),
+        th.Property("c_retouroptions", th.StringType),
+        th.Property("c_nohardtickets", th.StringType),
 
-        th.Property("c_publiceernaar", th.IntegerType),
-        th.Property("c_ypproductionid", th.StringType),
-        th.Property("c_codedisplaybeforestart", th.IntegerType),
 
         # Ticketmatic properties
         th.Property("id", th.IntegerType),
