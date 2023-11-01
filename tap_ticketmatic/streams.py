@@ -370,7 +370,7 @@ class Events(TicketmaticStream):
                     th.ArrayType(
                         th.ObjectType(
                             th.Property("saleschannels", th.ArrayType(th.IntegerType)),
-                            th.Property("prices", th.ArrayType(th.NumberType)),
+                            # th.Property("prices", th.ArrayType(th.NumberType)),
                             th.Property("availabilities", th.ArrayType(th.BooleanType)),
                             th.Property("pricetypeid", th.IntegerType),
                         ),
