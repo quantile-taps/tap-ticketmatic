@@ -127,7 +127,7 @@ class Orders(TicketmaticStream):
         th.Property("lastupdatets", th.DateTimeType),
         th.Property("c_remark", th.StringType),
         th.Property("c_podiumpascode", th.StringType),
-        th.Property("c_donatie", th.StringType),
+        th.Property("c_donatie", th.IntegerType),
     ).to_dict()
 
 
