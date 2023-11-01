@@ -144,7 +144,7 @@ class Events(TicketmaticStream):
         th.Property("c_genre", th.ArrayType(th.IntegerType)),
         th.Property("c_season", th.IntegerType),
         th.Property("c_hasupsells", th.StringType),
-        th.Property("c_isupsellfor", th.StringType),
+        th.Property("c_isupsellfor", th.NumberType),
         th.Property("c_ypname", th.StringType),
         th.Property("c_ypid", th.StringType),
         th.Property("c_ypstartts", th.DateTimeType),
