@@ -108,7 +108,7 @@ class Orders(TicketmaticStream):
                     th.Property("bundleid", th.IntegerType),
                     th.Property("barcode", th.StringType),
                     th.Property("deliveredts", th.StringType),
-                    th.Property("transferredto", th.StringType),
+                    th.Property("transferredto", th.IntegerType),
                     th.Property("cachedaccesscontrolstatus", th.IntegerType),
                     th.Property("eventid", th.IntegerType),
                     th.Property("pricetypeid", th.IntegerType),
