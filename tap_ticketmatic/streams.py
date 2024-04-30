@@ -420,13 +420,6 @@ class Contacts(PaginatedTicketmaticStream):
         th.Property("createdts", th.DateTimeType),
         th.Property("lastupdatets", th.DateTimeType),
         th.Property("isdeleted", th.BooleanType),
-        th.Property("apptoken", th.StringType),
-        th.Property("appnotifications", th.ArrayType(th.StringType)),
-        th.Property("appoptin", th.ObjectType(
-            th.Property("ip", th.StringType),
-        )),
-        th.Property("apponboardingstatus", th.IntegerType),
-        th.Property("appphone", th.StringType),
         th.Property("sendmail", th.BooleanType),
         th.Property("customertitleid", th.IntegerType),
         th.Property("firstname", th.StringType),
@@ -464,8 +457,12 @@ class Contacts(PaginatedTicketmaticStream):
         ))),
         th.Property("relationtypes", th.ArrayType(th.IntegerType)),
         th.Property("subscribed", th.BooleanType),
-        th.Property("optins", th.ArrayType(th.StringType)),
-        th.Property("relationships", th.ArrayType(th.StringType)),
+        th.Property("relationships", th.ArrayType(th.ObjectType(
+            th.Property("id", th.IntegerType),
+            th.Property("typeid", th.IntegerType),
+            th.Property("childcontactid", th.IntegerType),
+            th.Property("parentcontactid", th.IntegerType),
+        ))),
         th.Property("status", th.StringType),
     ).to_dict()
 
