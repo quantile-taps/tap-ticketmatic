@@ -1,11 +1,11 @@
 """Stream type classes for tap-ticketmatic."""
 
 from singer_sdk import typing as th
-from tap_ticketmatic.client import TicketmaticStream
+from tap_ticketmatic.client import TicketmaticStream, PaginatedTicketmaticStream
 from typing import Any, Dict, Optional
 
 
-class Orders(TicketmaticStream):
+class Orders(PaginatedTicketmaticStream):
     """Fetches the orders from Ticketmatic."""
     name = "orders"
     path = "/orders"
@@ -130,8 +130,7 @@ class Orders(TicketmaticStream):
         th.Property("c_donatie", th.IntegerType),
     ).to_dict()
 
-
-class Events(TicketmaticStream):
+class Events(PaginatedTicketmaticStream):
     """Fetches the events from Ticketmatic."""
     name = "events"
     path = "/events"
@@ -409,6 +408,83 @@ class Events(TicketmaticStream):
         th.Property("lastupdatets", th.DateTimeType),
     ).to_dict()
 
+class Contacts(PaginatedTicketmaticStream):
+    """Fetches the contacts from Ticketmatic."""
+    name = "contacts"
+    path = "/contacts"
+    primary_keys = ["id"]
+    replication_key = "lastupdatets"
+
+    schema = th.PropertiesList(
+        th.Property("id", th.IntegerType),
+        th.Property("createdts", th.DateTimeType),
+        th.Property("lastupdatets", th.DateTimeType),
+        th.Property("isdeleted", th.BooleanType),
+        th.Property("apptoken", th.StringType),
+        th.Property("appnotifications", th.ArrayType(th.StringType)),
+        th.Property("appoptin", th.ObjectType(
+            th.Property("ip", th.StringType),
+        )),
+        th.Property("apponboardingstatus", th.IntegerType),
+        th.Property("appphone", th.StringType),
+        th.Property("sendmail", th.BooleanType),
+        th.Property("customertitleid", th.IntegerType),
+        th.Property("firstname", th.StringType),
+        th.Property("middlename", th.StringType),
+        th.Property("lastname", th.StringType),
+        th.Property("email", th.StringType),
+        th.Property("languagecode", th.StringType),
+        th.Property("birthdate", th.StringType),
+        th.Property("company", th.StringType),
+        th.Property("sex", th.StringType),
+        th.Property("c_accountnumber", th.StringType),
+        th.Property("c_oldid", th.StringType),
+        th.Property("c_emailings", th.ArrayType(th.IntegerType)),
+        th.Property("c_emailingpreference", th.StringType),
+        th.Property("addresses", th.ArrayType(th.ObjectType(
+            th.Property("customerid", th.IntegerType),
+            th.Property("id", th.IntegerType),
+            th.Property("typeid", th.IntegerType),
+            th.Property("type", th.StringType),
+            th.Property("street1", th.StringType),
+            th.Property("street2", th.StringType),
+            th.Property("street3", th.StringType),
+            th.Property("zip", th.StringType),
+            th.Property("city", th.StringType),
+            th.Property("state", th.StringType),
+            th.Property("countrycode", th.StringType),
+            th.Property("country", th.StringType),
+        ))),
+        th.Property("phonenumbers", th.ArrayType(th.ObjectType(
+            th.Property("customerid", th.IntegerType),
+            th.Property("id", th.IntegerType),
+            th.Property("typeid", th.IntegerType),
+            th.Property("type", th.StringType),
+            th.Property("number", th.StringType),
+        ))),
+        th.Property("relationtypes", th.ArrayType(th.IntegerType)),
+        th.Property("subscribed", th.BooleanType),
+        th.Property("optins", th.ArrayType(th.StringType)),
+        th.Property("relationships", th.ArrayType(th.StringType)),
+        th.Property("status", th.StringType),
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: Optional[dict],
+        next_page_token: Optional[Any],
+    ) -> Dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization."""
+        start_date = self.get_starting_timestamp(context)
+
+        params = {
+            "limit": self.limit_per_request,
+            "offset": next_page_token,
+            "lastupdatesince": start_date,
+            "includearchived": "true",	
+        }
+
+        return params
 
 class PriceTypes(TicketmaticStream):
     """
@@ -428,21 +504,6 @@ class PriceTypes(TicketmaticStream):
         th.Property("lastupdatets", th.DateTimeType),
     ).to_dict()
 
-    def get_url_params(
-        self,
-        context: Optional[dict],
-        next_page_token: Optional[Any],
-    ) -> Dict[str, Any]:
-        """Return a dictionary of values to be used in URL parameterization."""
-        params = {
-            "limit": self.limit_per_request,
-            "output": "withlookup",
-            "includearchived": "true",
-        }
-
-        return params
-
-
 class SeatRanks(TicketmaticStream):
     """
     The original/custom seat ranks.
@@ -459,20 +520,6 @@ class SeatRanks(TicketmaticStream):
         th.Property("createdts", th.DateTimeType),
         th.Property("lastupdatets", th.DateTimeType),
     ).to_dict()
-
-    def get_url_params(
-        self,
-        context: Optional[dict],
-        next_page_token: Optional[Any],
-    ) -> Dict[str, Any]:
-        """Return a dictionary of values to be used in URL parameterization."""
-        params = {
-            "limit": self.limit_per_request,
-            "output": "withlookup",
-            "includearchived": "true",
-        }
-
-        return params
 
 class EventLocations(TicketmaticStream):
     """
@@ -500,16 +547,40 @@ class EventLocations(TicketmaticStream):
 
     ).to_dict()
 
-    def get_url_params(
-        self,
-        context: Optional[dict],
-        next_page_token: Optional[Any],
-    ) -> Dict[str, Any]:
-        """Return a dictionary of values to be used in URL parameterization."""
-        params = {
-            "limit": self.limit_per_request,
-            "output": "withlookup",
-            "includearchived": "true",
-        }
+class RelationTypes(TicketmaticStream):
+    """
+    The relation types.
+    """
+    name = "relation_types"
+    path = "/settings/system/relationtypes"
+    primary_keys = ["id"]
 
-        return params
+    schema = th.PropertiesList(
+        th.Property("id", th.IntegerType),
+        th.Property("name", th.StringType),
+        th.Property("createdts", th.DateTimeType),
+        th.Property("lastupdatets", th.DateTimeType),
+        th.Property("isarchived", th.BooleanType),
+
+    ).to_dict()
+
+class PaymentMethods(TicketmaticStream):
+    """
+    The payment methods.
+    """
+    name = "payment_methods"
+    path = "/settings/ticketsales/paymentmethods"
+    primary_keys = ["id"]
+
+    schema = th.PropertiesList(
+        th.Property("id", th.IntegerType),
+        th.Property("name", th.StringType),
+        th.Property("internalremark", th.StringType),
+        th.Property("paymentmethodtypeid", th.IntegerType),
+        th.Property("c_grootboekrekening", th.StringType),
+        th.Property("c_vismanetcode", th.StringType),
+        th.Property("createdts", th.DateTimeType),
+        th.Property("lastupdatets", th.DateTimeType),
+        th.Property("isarchived", th.BooleanType),
+
+    ).to_dict()
