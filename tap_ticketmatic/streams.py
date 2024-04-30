@@ -455,7 +455,7 @@ class Contacts(PaginatedTicketmaticStream):
             th.Property("type", th.StringType),
             th.Property("number", th.StringType),
         ))),
-        th.Property("relationtypes", th.ArrayType(th.IntegerType)),
+        th.Property("relationtypes", th.StringType),
         th.Property("subscribed", th.BooleanType),
         th.Property("relationships", th.ArrayType(th.ObjectType(
             th.Property("id", th.IntegerType),
