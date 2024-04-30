@@ -440,7 +440,7 @@ class Contacts(PaginatedTicketmaticStream):
         th.Property("c_accountnumber", th.StringType),
         th.Property("c_oldid", th.StringType),
         th.Property("c_emailings", th.ArrayType(th.IntegerType)),
-        th.Property("c_emailingpreference", th.StringType),
+        th.Property("c_emailingpreference", th.ArrayType(th.IntegerType)),
         th.Property("addresses", th.ArrayType(th.ObjectType(
             th.Property("customerid", th.IntegerType),
             th.Property("id", th.IntegerType),
