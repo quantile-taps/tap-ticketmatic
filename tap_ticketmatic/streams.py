@@ -1,12 +1,13 @@
 """Stream type classes for tap-ticketmatic."""
 
 from singer_sdk import typing as th
-from tap_ticketmatic.client import TicketmaticStream
+from tap_ticketmatic.client import TicketmaticStream, PaginatedTicketmaticStream
 from typing import Any, Dict, Optional
 
 
-class Orders(TicketmaticStream):
+class Orders(PaginatedTicketmaticStream):
     """Fetches the orders from Ticketmatic."""
+
     name = "orders"
     path = "/orders"
     primary_keys = ["orderid"]
@@ -131,15 +132,15 @@ class Orders(TicketmaticStream):
     ).to_dict()
 
 
-class Events(TicketmaticStream):
+class Events(PaginatedTicketmaticStream):
     """Fetches the events from Ticketmatic."""
+
     name = "events"
     path = "/events"
     primary_keys = ["id"]
     replication_key = "lastupdatets"
 
     schema = th.PropertiesList(
-
         th.Property("c_ticketlayoutvariant", th.IntegerType),
         th.Property("c_genre", th.ArrayType(th.IntegerType)),
         th.Property("c_season", th.IntegerType),
@@ -167,8 +168,6 @@ class Events(TicketmaticStream):
         th.Property("c_status", th.NumberType),
         th.Property("c_retouroptions", th.ArrayType(th.IntegerType)),
         th.Property("c_nohardtickets", th.BooleanType),
-
-
         # Ticketmatic properties
         th.Property("id", th.IntegerType),
         th.Property("name", th.StringType),
@@ -202,28 +201,36 @@ class Events(TicketmaticStream):
                     th.Property(
                         "eventspecificprices",
                         th.ObjectType(
-                            th.Property("prices", th.ArrayType(
-                                th.ObjectType(
-                                    th.Property("pricetypeid", th.IntegerType),
-                                    th.Property("availabilities",
-                                                th.ArrayType(th.BooleanType)),
-                                    th.Property("saleschannels",
-                                                th.ArrayType(th.IntegerType)),
-                                    # TODO: sometimes this returns [100,1000, null, null]. It seems to break on the nulls. Since th.NumberType cant change Nulls.
-                                    # th.Property("prices", th.ArrayType(th.NumberType))
-                                )
-                            )),
-                        ),
-                    ),
-                    th.Property("locks",
+                            th.Property(
+                                "prices",
                                 th.ArrayType(
                                     th.ObjectType(
-                                        th.Property("tickettypeid", th.IntegerType),
-                                        th.Property("locktypeid", th.IntegerType),
-                                        th.Property("amount", th.IntegerType),
+                                        th.Property("pricetypeid", th.IntegerType),
+                                        th.Property(
+                                            "availabilities",
+                                            th.ArrayType(th.BooleanType),
+                                        ),
+                                        th.Property(
+                                            "saleschannels",
+                                            th.ArrayType(th.IntegerType),
+                                        ),
+                                        # TODO: sometimes this returns [100,1000, null, null]. It seems to break on the nulls. Since th.NumberType cant change Nulls.
+                                        # th.Property("prices", th.ArrayType(th.NumberType))
                                     )
-                                )
                                 ),
+                            ),
+                        ),
+                    ),
+                    th.Property(
+                        "locks",
+                        th.ArrayType(
+                            th.ObjectType(
+                                th.Property("tickettypeid", th.IntegerType),
+                                th.Property("locktypeid", th.IntegerType),
+                                th.Property("amount", th.IntegerType),
+                            )
+                        ),
+                    ),
                     th.Property("pricelistid", th.IntegerType),
                     th.Property("withimportedbarcodes", th.BooleanType),
                 )
@@ -259,55 +266,72 @@ class Events(TicketmaticStream):
             "prices",
             th.ObjectType(
                 th.Property(
-                    "contingents", th.ArrayType(
+                    "contingents",
+                    th.ArrayType(
                         th.ObjectType(
                             th.Property("contingentid", th.IntegerType),
-                            th.Property("pricetypes", th.ArrayType(
-                                th.ObjectType(
-                                    th.Property("pricetypeid", th.IntegerType),
-                                    th.Property("saleschannels", th.ArrayType(
-                                        th.ObjectType(
-                                            th.Property("tickettypepriceid",
-                                                        th.IntegerType),
-                                            th.Property("saleschannelid",
-                                                        th.IntegerType),
-                                            th.Property("price", th.NumberType),
-                                            th.Property("servicecharge", th.NumberType),
-                                            th.Property(
-                                                "conditions", th.ArrayType(
-                                                    th.ObjectType(
-                                                        th.Property(
-                                                            "type",
-                                                            th.StringType,
+                            th.Property(
+                                "pricetypes",
+                                th.ArrayType(
+                                    th.ObjectType(
+                                        th.Property("pricetypeid", th.IntegerType),
+                                        th.Property(
+                                            "saleschannels",
+                                            th.ArrayType(
+                                                th.ObjectType(
+                                                    th.Property(
+                                                        "tickettypepriceid",
+                                                        th.IntegerType,
+                                                    ),
+                                                    th.Property(
+                                                        "saleschannelid", th.IntegerType
+                                                    ),
+                                                    th.Property("price", th.NumberType),
+                                                    th.Property(
+                                                        "servicecharge", th.NumberType
+                                                    ),
+                                                    th.Property(
+                                                        "conditions",
+                                                        th.ArrayType(
+                                                            th.ObjectType(
+                                                                th.Property(
+                                                                    "type",
+                                                                    th.StringType,
+                                                                ),
+                                                                # TODO: dit kan een dicionary zijn met start / end, een array met integers of een integer lol
+                                                                # th.Property(
+                                                                #     "value",
+                                                                #     th.ObjectType(
+                                                                #         th.Property(
+                                                                #             "start",
+                                                                #             th.DateTimeType,
+                                                                #         ),
+                                                                #         th.Property(
+                                                                #             "end",
+                                                                #             th.DateTimeType,
+                                                                #         ),
+                                                                #     ),
+                                                                # ),
+                                                            )
                                                         ),
-                                                        # TODO: dit kan een dicionary zijn met start / end, een array met integers of een integer lol
-                                                        # th.Property(
-                                                        #     "value",
-                                                        #     th.ObjectType(
-                                                        #         th.Property(
-                                                        #             "start",
-                                                        #             th.DateTimeType,
-                                                        #         ),
-                                                        #         th.Property(
-                                                        #             "end",
-                                                        #             th.DateTimeType,
-                                                        #         ),
-                                                        #     ),
-                                                        # ),
-                                                    )
-                                                ),
+                                                    ),
+                                                    # No idea what this array should include
+                                                    th.Property(
+                                                        "costs",
+                                                        th.ArrayType(th.StringType),
+                                                    ),
+                                                )
                                             ),
-                                            # No idea what this array should include
-                                            th.Property(
-                                                "costs", th.ArrayType(th.StringType)),
-                                        )
-                                    )),
-                                    th.Property("price", th.NumberType),
-                                    th.Property("tickettypepriceid", th.IntegerType),
+                                        ),
+                                        th.Property("price", th.NumberType),
+                                        th.Property(
+                                            "tickettypepriceid", th.IntegerType
+                                        ),
+                                    ),
                                 ),
                             ),
-                            ),
-                        )),
+                        )
+                    ),
                 ),
             ),
         ),
@@ -377,7 +401,6 @@ class Events(TicketmaticStream):
                     ),
                 ),
                 th.Property("seatrankids", th.ArrayType(th.IntegerType)),
-
             ),
         ),
         th.Property("seatingplanid", th.IntegerType),
@@ -410,10 +433,103 @@ class Events(TicketmaticStream):
     ).to_dict()
 
 
+class Contacts(PaginatedTicketmaticStream):
+    """Fetches the contacts from Ticketmatic."""
+
+    name = "contacts"
+    path = "/contacts"
+    primary_keys = ["id"]
+    replication_key = "lastupdatets"
+
+    schema = th.PropertiesList(
+        th.Property("id", th.IntegerType),
+        th.Property("createdts", th.DateTimeType),
+        th.Property("lastupdatets", th.DateTimeType),
+        th.Property("isdeleted", th.BooleanType),
+        th.Property("sendmail", th.BooleanType),
+        th.Property("customertitleid", th.IntegerType),
+        th.Property("firstname", th.StringType),
+        th.Property("middlename", th.StringType),
+        th.Property("lastname", th.StringType),
+        th.Property("email", th.StringType),
+        th.Property("languagecode", th.StringType),
+        th.Property("birthdate", th.StringType),
+        th.Property("company", th.StringType),
+        th.Property("sex", th.StringType),
+        th.Property("c_accountnumber", th.StringType),
+        th.Property("c_oldid", th.StringType),
+        th.Property("c_emailings", th.ArrayType(th.IntegerType)),
+        th.Property("c_emailingpreference", th.ArrayType(th.IntegerType)),
+        th.Property(
+            "addresses",
+            th.ArrayType(
+                th.ObjectType(
+                    th.Property("customerid", th.IntegerType),
+                    th.Property("id", th.IntegerType),
+                    th.Property("typeid", th.IntegerType),
+                    th.Property("type", th.StringType),
+                    th.Property("street1", th.StringType),
+                    th.Property("street2", th.StringType),
+                    th.Property("street3", th.StringType),
+                    th.Property("zip", th.StringType),
+                    th.Property("city", th.StringType),
+                    th.Property("state", th.StringType),
+                    th.Property("countrycode", th.StringType),
+                    th.Property("country", th.StringType),
+                )
+            ),
+        ),
+        th.Property(
+            "phonenumbers",
+            th.ArrayType(
+                th.ObjectType(
+                    th.Property("customerid", th.IntegerType),
+                    th.Property("id", th.IntegerType),
+                    th.Property("typeid", th.IntegerType),
+                    th.Property("type", th.StringType),
+                    th.Property("number", th.StringType),
+                )
+            ),
+        ),
+        th.Property("relationtypes", th.ArrayType(th.IntegerType)),
+        th.Property("subscribed", th.BooleanType),
+        th.Property(
+            "relationships",
+            th.ArrayType(
+                th.ObjectType(
+                    th.Property("id", th.IntegerType),
+                    th.Property("typeid", th.IntegerType),
+                    th.Property("childcontactid", th.IntegerType),
+                    th.Property("parentcontactid", th.IntegerType),
+                )
+            ),
+        ),
+        th.Property("status", th.StringType),
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: Optional[dict],
+        next_page_token: Optional[Any],
+    ) -> Dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization."""
+        start_date = self.get_starting_timestamp(context)
+
+        params = {
+            "limit": self.limit_per_request,
+            "offset": next_page_token,
+            "lastupdatesince": start_date,
+            "includearchived": "true",
+        }
+
+        return params
+
+
 class PriceTypes(TicketmaticStream):
     """
     The original/custom pricing types.
     """
+
     name = "price_types"
     path = "/settings/pricing/pricetypes"
     primary_keys = ["id"]
@@ -428,25 +544,12 @@ class PriceTypes(TicketmaticStream):
         th.Property("lastupdatets", th.DateTimeType),
     ).to_dict()
 
-    def get_url_params(
-        self,
-        context: Optional[dict],
-        next_page_token: Optional[Any],
-    ) -> Dict[str, Any]:
-        """Return a dictionary of values to be used in URL parameterization."""
-        params = {
-            "limit": self.limit_per_request,
-            "output": "withlookup",
-            "includearchived": "true",
-        }
-
-        return params
-
 
 class SeatRanks(TicketmaticStream):
     """
     The original/custom seat ranks.
     """
+
     name = "seat_ranks"
     path = "/settings/seatingplans/seatranks"
     primary_keys = ["id"]
@@ -460,24 +563,12 @@ class SeatRanks(TicketmaticStream):
         th.Property("lastupdatets", th.DateTimeType),
     ).to_dict()
 
-    def get_url_params(
-        self,
-        context: Optional[dict],
-        next_page_token: Optional[Any],
-    ) -> Dict[str, Any]:
-        """Return a dictionary of values to be used in URL parameterization."""
-        params = {
-            "limit": self.limit_per_request,
-            "output": "withlookup",
-            "includearchived": "true",
-        }
-
-        return params
 
 class EventLocations(TicketmaticStream):
     """
     The event locations.
     """
+
     name = "event_locations"
     path = "/settings/events/eventlocations"
     primary_keys = ["id"]
@@ -497,19 +588,62 @@ class EventLocations(TicketmaticStream):
         th.Property("createdts", th.DateTimeType),
         th.Property("lastupdatets", th.DateTimeType),
         th.Property("isarchived", th.BooleanType),
-
     ).to_dict()
 
-    def get_url_params(
-        self,
-        context: Optional[dict],
-        next_page_token: Optional[Any],
-    ) -> Dict[str, Any]:
-        """Return a dictionary of values to be used in URL parameterization."""
-        params = {
-            "limit": self.limit_per_request,
-            "output": "withlookup",
-            "includearchived": "true",
-        }
 
-        return params
+class RelationTypes(TicketmaticStream):
+    """
+    The relation types.
+    """
+
+    name = "relation_types"
+    path = "/settings/system/relationtypes"
+    primary_keys = ["id"]
+
+    schema = th.PropertiesList(
+        th.Property("id", th.IntegerType),
+        th.Property("name", th.StringType),
+        th.Property("createdts", th.DateTimeType),
+        th.Property("lastupdatets", th.DateTimeType),
+        th.Property("isarchived", th.BooleanType),
+    ).to_dict()
+
+
+class PaymentMethods(TicketmaticStream):
+    """
+    The payment methods.
+    """
+
+    name = "payment_methods"
+    path = "/settings/ticketsales/paymentmethods"
+    primary_keys = ["id"]
+
+    schema = th.PropertiesList(
+        th.Property("id", th.IntegerType),
+        th.Property("name", th.StringType),
+        th.Property("internalremark", th.StringType),
+        th.Property("paymentmethodtypeid", th.IntegerType),
+        th.Property("c_grootboekrekening", th.StringType),
+        th.Property("c_vismanetcode", th.StringType),
+        th.Property("createdts", th.DateTimeType),
+        th.Property("lastupdatets", th.DateTimeType),
+        th.Property("isarchived", th.BooleanType),
+    ).to_dict()
+
+
+class PaymentScenarios(TicketmaticStream):
+    """
+    A payment scenario defines how a customer will pay for an order.
+    This is not necessarily linked to a specific payment method.
+    """
+
+    name = "payment_scenarios"
+    path = "/settings/ticketsales/paymentscenarios"
+    primary_keys = ["id"]
+
+    schema = th.PropertiesList(
+        th.Property("id", th.IntegerType),
+        th.Property("name", th.StringType),
+        th.Property("lastupdatets", th.DateTimeType),
+        th.Property("isarchived", th.BooleanType),
+    ).to_dict()
