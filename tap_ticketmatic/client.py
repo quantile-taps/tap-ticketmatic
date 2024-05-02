@@ -20,9 +20,9 @@ class TicketmaticPaginator(BaseOffsetPaginator):
         return bool(data)
 
 
-
 class TicketmaticStream(RESTStream):
     """Ticketmatic stream class."""
+
     records_jsonpath = "$.data[*]"
     limit_per_request = 1000
 
@@ -39,7 +39,7 @@ class TicketmaticStream(RESTStream):
             username=self.config["api_key"],
             password=self.config["api_secret"],
         )
-    
+
     def get_url_params(
         self,
         context: Optional[dict],
@@ -52,9 +52,9 @@ class TicketmaticStream(RESTStream):
 
         return params
 
+
 class PaginatedTicketmaticStream(TicketmaticStream):
 
-    
     def get_url_params(
         self,
         context: Optional[dict],
