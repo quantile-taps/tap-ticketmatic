@@ -4,7 +4,17 @@ from typing import List
 
 from singer_sdk import Stream, Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
-from tap_ticketmatic.streams import Orders, Events, Contacts, PriceTypes, SeatRanks, EventLocations, RelationTypes, PaymentMethods
+from tap_ticketmatic.streams import (
+    Orders,
+    Events,
+    Contacts,
+    PriceTypes,
+    SeatRanks,
+    EventLocations,
+    RelationTypes,
+    PaymentMethods,
+    PaymentScenarios,
+)
 
 STREAM_TYPES = [
     Orders,
@@ -14,12 +24,14 @@ STREAM_TYPES = [
     SeatRanks,
     EventLocations,
     RelationTypes,
-    PaymentMethods
+    PaymentMethods,
+    PaymentScenarios,
 ]
 
 
 class Tapticketmatic(Tap):
     """ticketmatic tap class."""
+
     name = "tap-ticketmatic"
 
     config_jsonschema = th.PropertiesList(
@@ -42,7 +54,7 @@ class Tapticketmatic(Tap):
             "start_date",
             th.StringType,
             default="2022-10-01",
-        )
+        ),
     ).to_dict()
 
     def discover_streams(self) -> List[Stream]:
