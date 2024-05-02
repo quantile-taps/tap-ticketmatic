@@ -1,0 +1,30 @@
+{
+    "debug.internalConsoleOptions": "neverOpen",
+    "files.exclude": {
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/CVS": true,
+      "**/.DS_Store": true,
+      "**/.pytest_cache": true,
+      "**/__pycache__": true,
+      "**/node_modules": true,
+      ".ipynb_checkpoints": true,
+      "**.egg-info": true,
+      "**/build": true,
+      "dist": true,
+      ".venv": true,
+      ".docker": true,
+      "tmp*": true
+    },
+    "python.linting.enabled": false,
+    "workbench.colorCustomizations": {
+      "statusBarItem.remoteBackground": "#ffb709",
+      "statusBarItem.remoteForeground": "#161c24"
+    },
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.formatting.provider": "none"
+  }
+  
