@@ -7,9 +7,9 @@ keywords = ["ELT", "ticketmatic"]
 license = "Apache 2.0"
 
 [tool.poetry.dependencies]
-python = "<3.12,>=3.7.1"
+python = ">=3.9"
 requests = "^2.25.1"
-singer-sdk = "^0.13.1"
+singer-sdk = "^0.44.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.2.5"
